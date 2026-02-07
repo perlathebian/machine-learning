@@ -116,6 +116,9 @@ At high-level, generative models learn patterns in data with the goal to produce
 
 ## Linear Regression
 
+<details>
+<summary>Show Details</summary>
+
 Statistical technique used to find the relationship between variables. In ML context, linear regression finds the relationship between features and label.
 
 ### Linear Regression Equation
@@ -142,22 +145,30 @@ Loss is a numeric metric that describes how wrong a model's predictions are. It 
 
 #### Types of Losses in Linear Regression
 
-1. $\mathrm{L}_1$ Loss: sum of the absolute values of the difference between teh actual values and the predicted values
+1. $\text{L}_1$ Loss: sum of the absolute values of the difference between the actual values and the predicted values
+
    $$
    \sum_{i=1}^{N} \lvert \text{actual value}_i - \text{predicted value}_i \rvert
    $$
-2. Mean Absolute Error (MAE): the average of $\mathrm{L}_1$ losses over a set of $N$ examples
+
+2. Mean Absolute Error (MAE): the average of $\text{L}_1$ losses over a set of $N$ examples
+
    $$
    \frac{1}{N} \sum_{i=1}^{N} \lvert \text{actual value}_i - \text{predicted value}_i \rvert
    $$
-3. $\mathrm{L}_2$ Loss: sum of squared difference between predicted and actual values
+
+3. $\text{L}_2$ Loss: sum of squared difference between predicted and actual values
+
    $$
    \sum_{i=1}^{N} (\text{actual value}_i - \text{predicted value}_i)^2
    $$
-4. Mean Squared Error (MSE): the average of $\mathrm{L}_2$ losses across a set of $N$ examples
+
+4. Mean Squared Error (MSE): the average of $\text{L}_2$ losses across a set of $N$ examples
+
    $$
    \frac{1}{N} \sum_{i=1}^{N} (\text{actual value}_i - \text{predicted value}_i)^2
    $$
+
 5. Root Mean Squared Error (RMSE): the square root of the mean squared error (MSE)
    $$
    \sqrt{
@@ -215,6 +226,76 @@ Note: Noise isn't always bad. A certain amount of noise can be a good thing (can
 During training, an epoch means that the model processed each example in the training set exactly once.
 Example: given a training set with 1000 examples, and a mini-batch of 100 examples, it will take the model 10 iterations to complete one epoch (1 epoch = number of examples / batch size).
 Training requires multiple epochs, meaning the model needs to process every example in the training set multiple times. This hyperparameter is set before training begins. In general, more epochs produces a better model, but takes more time to train.
+
+</details>
+
+---
+
+## Logistic Regression
+
+<details>
+<summary>Show Details</summary>
+
+### What is Logistic Regression
+
+It would be useful if a regression model predicted a formal probability, a value from 0 to 1, representing the chances that some condition happens. This type of regression task is called logistic regression. To get a linear model to output a probability, we need to transform the model to apply some limits so it outputs continuous values that fall within the range from 0 to 1. To find the mathematical function we can use to do this, we can think of two curves; an exponential curve and a hyperbola. Both produce outputs that approach a limit in at least one direction, but neither range is constrained to values between 0 and 1. If we combine the two formulas, we create a curve whose output is squished between 0 and 1. As the input decreases to negative infinity, the output approaches 0, adn as the input increases to infinity, the output approaches 1. This is a sigmoid curve, one of a family of s-shaped curves called logistic functions, from which logistic regression gets its name.
+Logistic regression is a popular technique for building models that discriminate between two possible outcomes, including classification tasks.
+Logistic regression model's output can be used as-is (probability estimate, e.g., 0.93 or 93%), or can be converted to a binary category (such as True or False, Spam or Not Spam).
+
+### Sigmoid Function
+
+This is the standard logistic function, and has formula: $f(x) = \frac{1}{1 + e^{-x}}$
+
+#### Transforming Linear Output Using Sigmoid Function
+
+The linear component of a logistic regression model has the following equation: $z = b + w_1 x_1 + w_2 x_2 + \dots + w_N x_N$, where
+
+- $z$ is the output of the linear equation, also called log odds
+- $b$ is the bias
+- the $w$ values are the model's learned weights
+- the $x$ values are the feature values
+
+To obtain the logistic regression prediction, the $z$ value is passed to the sigmoid function resulting in a value between 0 and 1 (the probability): $y' = \frac{1}{1 + e^{-z}}$, where
+
+- $y'$ is the output of the logistic regression model
+- $e$ is the Euler number (~2.7)
+- $z$ is the linear output
+
+### Loss and Regularization
+
+Logistic regression models are trained using the same process as linear regression, except that for logistic regression:
+
+- models use log loss as the loss function instead of squared loss
+- regularization is applied to prevent overfitting
+
+#### Log Loss
+
+Squared loss, $\text{L}_2$, works well for the linear model where the rate of change of output values is constant. In contrast, the rate of change of a logistic regression model is not constant. When the log odds ($z$) value is closer to 0, small increases in $z$ result in much larger changes in $y$ than if $z$ was a large positive or negative number.
+The loss function for logistic regression is Log Loss. The Log Loss equation returns the logarithm of the magnitude of change, rather than just the distance from the data to prediction. Log Loss is calculated as follows:
+
+$$
+\text{Log Loss} = -\frac{1}{N} \sum_{i=1}^{N}
+\left[
+y_i \log(y'_i) + (1 - y_i)\log(1 - y'_i)
+\right]
+$$
+
+where,
+
+- $N$ is the number of labeled examples in the dataset
+- $i$ is the index of an example in the dataset (example ($\text{x}_3$, $\text{y}_3$) is the third example in the dataset)
+- $\text{y}_i$ is the label for the ith example (must be 0 or 1)
+- $\text{y}_i$' is your model's prediction for the ith example (between 0 and 1), given the set of features in $\text{x}_i$
+
+#### Regularization
+
+A mechanism for penalizing model complexity during training, extremely important in logistic regression modeling.
+Two ways to decrease model complexity:
+
+- $\text{L}_2$ regularization
+- Early stopping: limiting the number of training steps to halt training while loss is decreasing
+
+</details>
 
 ---
 
