@@ -145,34 +145,36 @@ Loss is a numeric metric that describes how wrong a model's predictions are. It 
 
 #### Types of Losses in Linear Regression
 
-1. $\text{L}_1$ Loss: sum of the absolute values of the difference between the actual values and the predicted values
+#### Types of Losses in Linear Regression
+
+1. **L₁ Loss**: sum of the absolute values of the difference between the actual values and the predicted values
 
 $$
 \sum_{i=1}^{N} \lvert \text{actual value}_i - \text{predicted value}_i \rvert
 $$
 
-2. Mean Absolute Error (MAE): the average of $\text{L}_1$ losses over a set of $N$ examples
+2. **Mean Absolute Error (MAE)**: the average of L₁ losses over a set of N examples
 
 $$
 \frac{1}{N} \sum_{i=1}^{N} \lvert \text{actual value}_i - \text{predicted value}_i \rvert
 $$
 
-3. $\text{L}_2$ Loss: sum of squared difference between predicted and actual values
+3. **L₂ Loss**: sum of squared difference between predicted and actual values
 
 $$
 \sum_{i=1}^{N} (\text{actual value}_i - \text{predicted value}_i)^2
 $$
 
-4. Mean Squared Error (MSE): the average of $\text{L}_2$ losses across a set of $N$ examples
+4. **Mean Squared Error (MSE)**: the average of L₂ losses across a set of N examples
 
 $$
 \frac{1}{N} \sum_{i=1}^{N} (\text{actual value}_i - \text{predicted value}_i)^2
 $$
 
-5. Root Mean Squared Error (RMSE): the square root of the mean squared error (MSE)
+5. **Root Mean Squared Error (RMSE)**: the square root of the mean squared error (MSE)
 
 $$
-\sqrt{\frac{1}{N} \sum_{i=1}^{N} (\text{actual value}_i - \text{predicted value}_i)^2}
+\sqrt{ \frac{1}{N} \sum_{i=1}^{N} (\text{actual value}_i - \text{predicted value}_i)^2 }
 $$
 
 MAE and RMSE give errors in the same units as what you're predicting, so humans can understand them more easily. MAE represents the average prediction error, whereas RMSE represents the spread of the errors.
