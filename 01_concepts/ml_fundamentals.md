@@ -324,6 +324,43 @@ Different thresholds usually result in different numbers of true and false posit
 As the threshold increases, the model will likely predict fewer positives overall, both true and false. A spam classifier with a threshold of .9999 will only label an email as spam if it considers the classification to be at least 99.99% likely, which means it is highly unlikely to mislabel a legitimate email, but also likely to miss actual spam email.
 As the threshold increases, the model will likely predict more negatives overall, both true and false. At a very high threshold, almost all emails, both spam and not-spam, will be classified as not-spam.
 
+### Metrics
+
+[Jump to Classification Metrics](#classification-metrics)
+
+### ROC and AUC
+
+Model metrics evaluate a model at a single classification threshold value. There are different tools that can evaluate a model's quality across all possible thresholds.
+
+#### Receiver-Operating Characteristic curve (ROC)
+
+The ROC curve is a visual representation of the model's performance across all thresholds. It is drawn by calculating the TPR and the FPR at every possible threshold (in practice, at selected intervals), then graphing TPR over FPR.
+
+The points on a ROC curve closest to the point (0,1) represent the best-performing thresholds for that model.
+
+#### Area Under the Curve (AUC)
+
+This represents the probability that a model, given a randomly chosen positive and negative example, will rank the positive higher than the negative.
+
+Example: a spam classifier with AUC of 1.0 always assigns a random spam email a higher probability of being spam than a random legitimate email
+
+AUC is a good measure for comparing performance of two different models, as long as the dataset is roughly balanced. The model with the greater AUC is generally the better one.
+
+### Prediction Bias
+
+This is a quick check that can flag issues with the model or training data early on. Prediction bias is the difference between the mean of the model's predictions and the mean of the ground-truth labels in the data.
+Prediction bias can be caused by:
+
+- biases or noise in the data
+- too strong regularization (model unnecessarily oversimplified)
+- bugs in the model training pipeline
+- set of features were insufficient
+
+### Multi-class Classification
+
+Multi-class classification can be treated as an extension of binary classification to more than two classes.
+If class membership isn't exclusive, which is to say, an example can be assigned to multiple classes, this is known as a multi-label classification problem.
+
 </details>
 
 ---
