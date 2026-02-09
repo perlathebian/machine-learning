@@ -500,6 +500,125 @@ For an imbalanced dataset, FPR is generally a more informative metric than accur
 
 ---
 
+## Data
+
+The model ingests an array of floating-point values called a feature vector. The feature vector doesn't use the dataset's raw values, but instead processed feature values that represent these raw values.
+
+Feature engineering is determining the best way to represent raw dataset values as trainable values in the feature vector. The most common feature engineering techniques are:
+
+- Normalization: converting numerical values into a standard range
+- Binning/Bucketing: converting numerical values into buckets of ranges
+
+Detecting Outliers in a Dataset:
+
+- the standard deviation is almost as high as the mean
+- the delta between 75% and max is much higher than the delta between min and 25%.
+
+### Numerical Data: Normalization
+
+The goal of normalization is to transform features to be on similar scale.
+
+Benefits of normalization:
+
+- helps model converge more quikcly during training
+- helps model infer more useful predictions
+- helps model avoid NaN trap when feature values are very high (when a value exceeds floating-point precision limit, it is set to NaN instead of a number)
+- helps model learn appropriate weights for each feature
+
+Three popular normalization methods:
+
+- Linear Scaling
+- Z-score scaling
+- Log scaling
+
+#### Linear Scaling
+
+Linear scaling (more commonly scaling) means converting floating-point values from their natural range into a standard range (usually 0 to 1 or -1 to +1). Its formula: $x' = \frac{x - x_{\min}}{x_{\max} - x_{\min}}$, where:
+
+- $x'$ is the scaled value
+- $x$ is the original value
+- $x_{\min}$ is the lowest value in the dataset of this feature
+- $x_{\max}$ is the highest value in the dataset of this feature
+
+Linear scaling is a good choice when all of these conditions are met:
+
+1. The lower and upper bounds of your data don't change much over time (human age typically between 0 and 100)
+2. The feature contains few or no outliers, and those outliers aren't extreme (only 3% of population over 100)
+3. The feature is approximately uniformly distributed across its range. That is, a histogram would show roughly even bars for most values.
+
+Most real-world features do not meet all of the criteria for linear scaling. Z-score scaling is typically a better normalization choice than linear scaling. Linear scaling better for uniform distributions (flat-shaped), while z-score scaling is better for normal distributions (bell-shaped, peak close to mean).
+
+#### Z-score Scaling
+
+A Z-score is the number of standard deviations a value is from the mean. Representing a feature with Z-score scaling means storing that feature's Z-score in the feature vector. Its formula: $x' = \frac{x - \mu}{\sigma}$, where
+
+- $x'$ is the z-score
+- $x$ is the raw value
+- $\mu$ is the mean
+- $\sigma$ is the standard deviation
+
+#### Log Scaling
+
+Log scaling computes the logarithm of the raw value. In practice, log scaling usually calculates the natural logarithm (ln). Its formula: $x' = \ln(x)$.
+
+Log scaling is helpful when the data conforms to a power law distribution. A power law distribution looks as follows:
+
+- Low values of X have very high values of Y
+- As the values of X increase, the values of Y quickly decrease. Consequently, high values of X have very low values of Y.
+
+Log scaling can be used when the feature distribution is heavy skewed on at least either side of tail (heavy tail-shaped).
+
+#### Clipping (not a true normalization technique, but can be very effective)
+
+Clipping is a technique to minimize the influence of extreme outliers. It usually reduces the value of outliers to a specific maximum value.
+Example: clipping the feature value at 4.0 doesn't mean that your model ignores all values greater than 4.0. Rather, it means that all values that were greater than 4.0 now become 4.0.
+Clipping can be used when training a model and/or after using normalization (for example, if few outliers have absolute values far greater than 3).
+
+### Numerical Data: Binning
+
+Binning/bucketing is a feature engineering technique that groups different numerical subranges into bins or buckets. In many cases, binning turns numerical data into categorical data. A model trained on these bins will react no differently to feature values if they are in the same bin. Even though a feature is a single column in the dataset, binning causes a model to treat that feature as $n$ separate features (where $n$ is the number of bins). Therefore, the model learns separate weights for each bin. A model can only learn the association between a bin and a label if there are enough examples in that bin.
+
+Binning is a good alternative to scaling or clipping when either of the following conditions is met:
+
+1. The overall linear relationship between the feature and the label is weak or nonexistent.
+2. When the feature values are clustered.
+
+Binning transforms numerical data into categorical data.
+
+#### Quantile Bucketing
+
+Quantile bucketing creates bucketing boundaries such that the number of examples in each bucket is exactly or nearly equal. Quantile bucketing mostly hides the outliers.
+
+Bucketing with equal intervals works for many data distributions. For skewed data, however, quantile bucketing is more useful. Equal intervals give extra information space to the long tail while compacting the large torso into a single bucket. Quantile buckets give extra information space to the large torso while compacting the long tail into a single bucket.
+
+### Numerical Data: Scrubbing
+
+Many examples in datasets are unreliable due to one or more of the following problems:
+
+- Omitted values
+- Duplicate examples
+- Out-of-range feature values
+- Bad labels
+
+### Qualities of Good Numerical Features
+
+1. Clearly named
+2. Checked or tested before training
+3. Sensible
+
+### Numerical Data: Polynomial Transforms
+
+Polynomial transforming is a trick where you don’t change the model, you just change what you feed into it. A linear model is “linear” not in terms of the original real-world relationship, but in terms of the features it sees. When you square a feature (or cube it, etc.), you’re creating a new column of data that the model treats like any other input. From the model’s point of view, it’s still doing a weighted sum of features (add this times a weight, plus that times a weight) which is why training with gradient descent works exactly the same.
+What changes is the shape the model can represent in the original space. A straight line in the transformed feature space becomes a curve when you map it back to the original variable. So even though the model is mathematically linear, it can draw curved boundaries in the real world because the features themselves are nonlinear transformations of the data.
+
+Example: if your features are: original value: $x$ and synthetic feature: $x²$
+The model sees:
+
+- feature 1: some number
+- feature 2: another number
+
+Synthetic features can be created to model non-linear relationships between two features. These synthetic features can then be used as inputs to a linear model to enable it to represent nonlinearities.
+
 ## Overfitting vs Underfitting
 
 ### Overfitting
