@@ -673,11 +673,266 @@ Domain knowledge can suggest a useful combination of features to cross. Without 
 
 Crossing two sparse features produces an even sparser new feature than the two original features. For example, if feature A is a 100-element sparse feature and feature B is a 200-element sparse feature, a feature cross of A and B yields a 20,000-element sparse feature.
 
+## Datasets, Generalization, and Overfitting
+
+### Types of Data
+
+A dataset could contain many kinds of datatypes including:
+
+- numerical data
+- categorical data
+- human language, including words, sentences, entire text documents
+- multimedia (such as images, videos, and audio files)
+- outputs from other ML systems
+- embedding vectors
+
+### Quantity of Data
+
+As a rule of thumb (not strict law) model should train on at least an order of magnitude (10x) or two (100x) more examples than trainable parameters. However, good models generally train on substantially more examples than that.
+Models trained on large datasets with few features generally outperform models trained on small datasets with a lot of features.
+
+It's possible to get good results from a small dataset if you are adapting an existing model already trained on large quantities of data from the same schema.
+
+### Quality and Reliability
+
+A **high-quality** dataset helps your model accomplish its goal. A low quality dataset inhibits your model from accomplishing its goal.
+A high-quality dataset is usually also reliable. **Reliability** refers to the degree to which you can trust your data. A model trained on a reliable dataset is more likely to yield useful predictions than a model trained on unreliable data.
+
+Common causes of unreliable data:
+
+- Omitted values
+- Duplicate examples
+- Bad feature values
+- Bad labels
+- Bad sections of data
+
+Automation can be used to flag unreliable data (e.g., unit tests for out of range values).
+
+#### Complete vs Incomplete Examples
+
+In a perfect scenario, each example is complete: each feature of an example has a value. In real world, most examples are incomplete: at least one feature value is missing. Training should be on complete examples. To fix or eliminate incomplete examples do one of the following:
+
+1. Delete incomplete examples
+2. Impute missing values (providing well-reasoned guesses for the missing values)
+
+If the dataset contains enough complete examples to train a useful model, then consider deleting the incomplete examples. If only one feature is missing a significant amount of data and that one feature probably can't help the model much, then consider deleting that feature if the model works just or almost as well without it. Conversely, if you don't have enough complete examples to train a useful model, then you might consider imputing missing values.
+
+If you can't decide whether to delete or impute, consider building two datasets: one formed by deleting incomplete examples and the other by imputing. Then, determine which dataset trains the better model.
+
+One common algorithm for imputation is to use the mean or median as the imputed value. Consequently, when you represent a numerical feature with Z-scores, then the imputed value is typically 0 (because 0 is generally the mean Z-score).
+
+Imputed values are rarely as good as the actual values. Therefore, a good dataset tells the model which values are imputed and which are actual. One way to do this is to add an extra Boolean column to the dataset that indicates whether a particular feature's value is imputed.Then, during training, the model will probably gradually learn to trust examples containing imputed values for feature temperature less than examples containing actual values.
+
+#### Direct vs Proxy Labels
+
+Direct labels are labels that are exactly what the model is trying to predict and already exist as a column in the dataset. Direct labels are preferred and should be used whenever they are available.
+
+Proxy labels are labels that are related to, but not identical to, the prediction target. Proxy labels are imperfect approximations, and models trained on them are only as good as the strength of the relationship between the proxy and the true prediction.
+
+Sometimes a direct label does not exist or cannot be easily represented as a numeric floating-point value, which machine learning models require. In these cases, a proxy label is used as a practical compromise.
+
+### Class-balanced datasets vs class-imbalanced datasets
+
+Consider a dataset containing a categorical label whose value is either the positive class or the negative class. In a class-balanced dataset, the number of positive classes and negative classes is about equal.
+
+In a class-imbalanced dataset, one label is considerably more common than the other. In the real world, class-imbalanced datasets are far more common than class-balanced datasets.In a class-imbalanced dataset the more common label is called the majority class, and the less common label is called the minority class.
+
+**Difficulty training class-imbalanced datasets**
+Training aims to create a model that successfully distinguishes the positive class from the negative class. To do so, batches need a sufficient number of both positive classes and negative classes. That's not a problem when training on a mildly class-imbalanced dataset since even small batches typically contain sufficient examples of both the positive class and the negative class. However, a severely class-imbalanced dataset might not contain enough minority class examples for proper training.
+
+Accuracy is usually a poor metric for assessing a model trained on a class-imbalanced dataset.
+
+**Training a class-imbalanced dataset**
+During training, a model should learn two things:
+
+- What each class looks like; what feature values correspond to what class.
+- How common each class is; what is the relative distribution of the classes.
+  Standard training combines these two goals. The following two-step technique called **downsampling** and **upweighting** the majority class separates these two goals, enabling the model to achieve both goals.
+
+#### First: Downsample the majority class
+
+Downsampling means training on a disproportionately low percentage of majority class examples. That is, you artificially force a class-imbalanced dataset to become somewhat more balanced by omitting many of the majority class examples from training. Downsampling greatly increases the probability that each batch contains enough examples of the minority class to train the model properly and efficiently.
+
+#### Then: Upweight the downsampled class
+
+Downsampling introduces a prediction bias by showing the model an artificial world where the classes are more balanced than in the real world. To correct this bias, you must upweight the majority classes by the factor to which you downsampled. Upweighting means treating the loss on a majority class example more harshly than the loss on a minority class example.
+
+To rebalance your dataset you should experiment with different downsampling and upweighting factors just as you would experiment with other hyperparameters.
+
+Downsampling and upweighting the majority class brings the following **benefits**:
+
+- Better model: The resultant model "knows" both of the following: the connection between features and labels, and the true distribution of the classes
+- Faster convergence: During training, the model sees the minority class more often, which helps the model converge faster.
+
+### Dividing the Original Dataset
+
+#### Training, Validation, and Test Sets
+
+You should test a model against a different set of examples than those used to train the model. Testing on different examples is stronger proof of your model's fitness than testing on the same set of examples. You get those different examples by splitting the original dataset. The original dataset is split into two subsets:
+
+- A training set that the model trains on.
+- A test set for evaluation of the trained model.
+
+The more often you use the same test set, the more likely the model closely fits the test set, which might make it harder for the model to fit real-world data.
+
+A better approach is to divide the dataset into three subsets. In addition to the training set and the test set, the third subset is:
+
+- A validation set performs the initial testing on the model as it is being trained.
+
+Use the validation set to evaluate results from the training set. After repeated use of the validation set suggests that your model is making good predictions, use the test set to double-check your model.
+
+"Tweaking a model" means adjusting anything about the model; from changing the learning rate, to adding or removing features, to designing a completely new model from scratch.
+An ML workflow consists of the following stages:
+
+1. Training model on the training set.
+2. Evaluating model on the validation set.
+3. Tweaking model according to results on the validation set.
+4. Iterate on 1, 2, and 3, ultimately picking the model that does best on the validation set.
+5. Confirm the results on the test set.
+
+When you transform a feature in your training set, you must make the same transformation in the validation set, test set, and real-world dataset.
+The workflow above is optimal, but even with that, test sets and validation sets still wear out with repeated use. That is, the more you use the same data to make decisions about hyperparameter settings or other model improvements, the less confidence that the model will make good predictions on new data. For this reason, it's a good idea to collect more data to refresh the test set and validation set.
+
+Training and testing are nondeterministic. Sometimes, by chance, your test loss is incredibly low. Rerun the test to confirm the result.Many of the examples in the test set can be duplicates of examples in the training set. This can be a problem in a dataset with a lot of redundant examples. It is strongly recommended to delete duplicate examples from the test set before testing.
+
+In summary, a good test set or validation set meets all of the following criteria:
+
+- Large enough to yield statistically significant testing results.
+- Representative of the dataset as a whole (don't pick a test set with different characteristics than the training set)
+- Representative of the real-world data that the model will encounter as part of its business purpose.
+- Zero examples duplicated in the training set.
+
+Every example used in testing the model is one less example used in training the model. Dividing examples into train/test/validation sets is a zero-sum game. This is the central trade-off.
+
 ## Overfitting vs Underfitting
+
+### Generalization
+
+When you train a model on data, you're teaching it to perform well on that specific set of data. But this training data is just a small subset of the real-world data. If a model makes high quality predictions on the training data, but much lower quality predictions on new data, then the model didn't generalize. In this case, it is said that the model has overfit the training data. It has been tuned so closely to specific patterns os the data it's already seen that it can identify patterns in new data. A model must make good predictions on new data. That is, you're aiming to create a model that "fits" new data.
+Generalization is the opposite of overfitting. That is, a model that generalizes well makes good predictions on new data. The goal is to create a model that generalizes well to new data.
+
+#### Generalization Conditions
+
+While developing a model, your test set serves as a proxy for real-world data. Training a model that generalizes well implies the following dataset conditions:
+
+- Examples must be independently and identically distributed (examples can't influence each other).
+- The dataset is stationary, meaning the dataset doesn't change significantly over time.
+- The dataset partitions have the same distribution (examples in the training set are statistically similar to the examples in the validation set, test set, and real-world data)
 
 ### Overfitting
 
+Overfitting means creating a model that matches (memorizes) the training set so closely that the model fails to make correct predictions on new data. An overfit model makes excellent predictions on the training set but poor predictions on new data.
+
+#### Detecting Overfitting
+
+The following curves help you detect overfitting:
+
+- loss curves
+- generalization curves
+  A loss curve plots a model's loss against the number of training iterations. A graph that shows two or more loss curves is called a generalization curve.
+  If the two loss curves (on training data and validation data) behave similarly at first and then diverge; meaning after a certain number of iterations, loss declines or holds steady (converges) for the training set, but increases for the validation set, this suggests overfitting.
+  In contrast, a generalization curve for a well-fit model shows two loss curves that have similar shapes.
+
+#### Overfitting Causes
+
+Very broadly speaking, overfitting is caused by one or both of the following problems:
+
+1. The training set doesn't adequately represent real life data (or the validation set or test set).
+
+- The model is too complex.
+
+#### Model Complexity
+
+Complex models typically outperform simple models on the training set. However, simple models typically outperform complex models on the test set (which is more important).
+
+#### Regularization
+
+Machine learning models must simultaneously meet two conflicting goals:
+
+- Fit data well.
+- Fit data as simply as possible.
+  One approach to keeping a model simple is to penalize complex models; to force the model to become simpler during training. Penalizing complex models is one form of regularization.
+
+#### Loss and complexity
+
+So far, it's suggested that the only goal when training was to minimize loss; that is: $minimize(loss)$
+Models focused solely on minimizing loss tend to overfit. A better training optimization algorithm minimizes some combination of loss and complexity: $minimize(loss+complexity)$
+Unfortunately, loss and complexity are typically inversely related. As complexity increases, loss decreases. As complexity decreases, loss increases. A reasonable middle ground should be found where the model makes good predictions on both the training data and real-world data. That is the model should find a reasonable compromise between loss and complexity.
+
+**What is complexity?**
+
+Complexity is a function of the model's weights. This is one way to measure some models' complexity. This metric is called **L1 regularization**.
+Complexity is also a function of the square of the model's weights. This metric is called **L2 regularization**.
+
+**L2 Regularization**
+
+$L_2$ regularization is a popular regularization metric, which uses the following formula:
+
+$$
+L_2 \text{ regularization} = w_1^2 + w_2^2 + \cdots + w_n^2
+$$
+
+Weights close to zero don't affect $L_2$ regularization much, but large weights can have a huge impact. $L_2$ regularization encourages weights toward 0, but never pushes weights all the way to zero. Since $L_2$ regularization encourages weights towards 0, the overall complexity will probably drop.
+
+**Regularization Rate (Lambda)**
+
+Training attempts to minimize some combination of loss and complexity: $minimize(loss+complexity)$.
+Model developers tune the overall impact of complexity on model training by multiplying its value by a scalar called the regularization rate. The Greek character lambda typically symbolizes the regularization rate.
+That is, model developers aim to do the following: $\text{minimize}(\text{loss} + \lambda\, \text{complexity})$
+
+A high regularization rate:
+
+- Strengthens the influence of regularization, thereby reducing the chances of overfitting.
+- Tends to produce a histogram of model weights having: a normal distribution, and a mean weight of 0.
+  A low regularization rate:
+- Lowers the influence of regularization, thereby increasing the chances of overfitting.
+- Tends to produce a histogram of model weights with a flat distribution.
+
+Setting the regularization rate to zero removes regularization completely. In this case, training focuses exclusively on minimizing loss, which poses the highest possible overfitting risk.
+
+**Picking the regularization rate**
+
+The ideal regularization rate produces a model that generalizes well to new, previously unseen data. That ideal value is data-dependent, so you must do some tuning.
+**Early stopping:** an alternative to complexity-based regularization
+Early stopping is a regularization method that doesn't involve a calculation of complexity. Instead, early stopping simply means ending training before the model fully converges. For example, you end training when the loss curve for the validation set starts to increase (slope becomes positive). Although early stopping usually increases training loss, it can decrease test loss. Early stopping is a quick, but rarely optimal, form of regularization. The resulting model is very unlikely to be as good as a model trained thoroughly on the ideal regularization rate.
+
+**Finding equilibrium between learning rate and regularization rate**
+Learning rate and regularization rate tend to pull weights in opposite directions. A high learning rate often pulls weights away from zero, and a high regularization rate pulls weights towards zero.
+If the regularization rate is high with respect to the learning rate, the weak weights tend to produce a model that makes poor predictions. Conversely, if the learning rate is high with respect to the regularization rate, the strong weights tend to produce an overfit model.
+
+Examples:
+
+For an oscillating loss curve, you can try:
+
+- Reducing the learning rate.
+- Reducing the training set to a tiny number of trustworthy examples.
+- Checking your data against a data schema to detect bad examples, and then remove the bad examples from the training set.
+
+For a loss curve with a sharp jump, causes can include:
+
+- The input data contains a burst of outliers.
+- The input data contains one or more NaNs—for example, a value caused by a division by zero.
+
+For curves where test loss diverges from training loss, reason can be:
+
+- The model is overfitting the training set.
+  Possible solutions:
+- Make the model simpler, possibly by reducing the number of features.
+- Increase the regularization rate.
+- Ensure that the training set and test set are statistically equivalent.
+
+For a loss curve that gets stuck, a possible cause can be:
+
+- The training set is not shuffled well. For example, a training set that contains 100 images of dogs followed by 100 images of cats may cause loss to oscillate as the model trains. Ensure that you shuffle examples sufficiently.
+
 ### Underfitting
+
+An underfit model doesn't even make good predictions on the training data. Underfitting is producing a model with poor predictive ability because the model hasn't fully captured the complexity of the training data. Many problems can cause underfitting, including:
+
+- Training on the wrong set of features.
+- Training for too few epochs or at too low a learning rate.
+- Training with too high a regularization rate.
+- Providing too few hidden layers in a deep neural network.
 
 ### How to Detect
 
