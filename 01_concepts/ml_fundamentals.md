@@ -619,6 +619,60 @@ The model sees:
 
 Synthetic features can be created to model non-linear relationships between two features. These synthetic features can then be used as inputs to a linear model to enable it to represent nonlinearities.
 
+### Categorical Data
+
+Categorical data has a specific set of possible values (could be strings like in color names, or numbers like in bins or postal codes).
+**Encoding means**converting categorical or other data to numerical vectors that a model can train on. This conversion is necessary because models can only train on floating-point values.
+
+#### Vocabulary and One-hot Encoding
+
+The term **dimension** is a synonym for the number of elements in a feature vector. Some categorical features are low dimensional.
+When a categorical feature has a low number of possible categories, you can encode it as a **vocabulary**. With a vocabulary encoding, the model treats each possible categorical value as a separate feature. During training, the model learns different weights for each category.
+
+**Index numbers**:
+
+Machine learning models can only manipulate floating-point numbers. Therefore, you must convert each string to a unique index number, starting from zero. After converting strings to unique index numbers, you'll need to process the data further to represent it in ways that help the model learn meaningful relationships between the values. If the categorical feature data is left as indexed integers and loaded into a model, the model would treat the indexed values as continuous floating-point numbers.
+
+**One-hot Encoding**:
+
+The next step in building a vocabulary is to convert each index number to its one-hot encoding. In a one-hot encoding each category is represented by a vector (array) of N elements, where N is the number of categories. Exactly one of the elements in a one-hot vector has the value 1.0; all the remaining elements have the value 0.0. It is the one-hot vector, not the string or the index number, that gets passed to the feature vector. The model learns a separate weight for each element of the feature vector.
+
+In a true one-hot encoding, only one element has the value 1.0. In a variant known as **multi-hot encoding**, multiple values can be 1.0.
+
+**Sparse Representation**
+
+A feature whose values are predominantly zero (or empty) is termed a sparse feature. Many categorical features tend to be sparse features. Sparse representation means storing the position of the 1.0 in a sparse vector.
+Notice that the sparse representation consumes far less memory than the N-element one-hot vector. Importantly, the model must train on the one-hot vector, not the sparse representation.
+
+The sparse representation of a multi-hot encoding stores the positions of all the nonzero elements.
+
+**Encoding high-dimensional categorical features**
+Some categorical features have a high number of dimensions. When the number of categories is high, one-hot encoding is usually a bad choice. Embeddings are usually a much better choice. Embeddings substantially reduce the number of dimensions, which benefits models in two important ways:
+
+1. The model typically trains faster.
+2. The built model typically infers predictions more quickly. That is, the model has lower latency.
+   Hashing (also called the hashing trick) is a less common way to reduce the number of dimensions.
+
+#### Outliers in Categorical Data
+
+Like numerical data, categorical data also contains outliers. Rather than giving each of these outlier examples a separate category, you can lump them into a single "catch-all" category called out-of-vocabulary (OOV). In other words, all the outlier examples are binned into a single outlier bucket. The system learns a single weight for that outlier bucket.
+
+#### Common Issues with Categorical Data
+
+Data manually labeled by human beings is often referred to as gold labels, and is considered more desirable than machine-labeled data for training models, due to relatively better data quality. This doesn't necessarily mean that any set of human-labeled data is of high quality. Human errors, bias, and malice can be introduced at the point of data collection or during data cleaning and processing (should be checked before training). Any two human beings may label the same example differently. The difference between human raters' decisions is called inter-rater agreement. You can get a sense of the variance in raters' opinions by using multiple raters per example and measuring inter-rater agreement.
+
+Machine-labeled data, where categories are automatically determined by one or more classification models, is often referred to as silver labels. Machine-labeled data can vary widely in quality. Data should be checked not only for accuracy and biases but also for violations of common sense, reality, and intention.
+
+#### Feature Crossing
+
+Feature crosses are created by taking the Cartesian product of two or more categorical or bucketed features of the dataset. Like polynomial transforms, feature crosses allow linear models to handle nonlinearities. Feature crosses also encode interactions between features.
+
+Feature crosses are somewhat analogous to Polynomial transforms. Both combine multiple features into a new synthetic feature that the model can train on to learn nonlinearities. Polynomial transforms typically combine numerical data, while feature crosses combine categorical data.
+
+Domain knowledge can suggest a useful combination of features to cross. Without that domain knowledge, it can be difficult to determine effective feature crosses or polynomial transforms by hand. It's often possible, if computationally expensive, to use neural networks to automatically find and apply useful feature combinations during training.
+
+Crossing two sparse features produces an even sparser new feature than the two original features. For example, if feature A is a 100-element sparse feature and feature B is a 200-element sparse feature, a feature cross of A and B yields a 20,000-element sparse feature.
+
 ## Overfitting vs Underfitting
 
 ### Overfitting
