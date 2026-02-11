@@ -148,34 +148,19 @@ Loss is a numeric metric that describes how wrong a model's predictions are. It 
 Types of Losses in Linear Regression
 
 1. **L₁ Loss**: sum of the absolute values of the difference between the actual values and the predicted values
-
-$$
-\sum_{i=1}^{N} | \text{actual value}_i - \text{predicted value}_i |
-$$
+   L₁ = |actual₁ - predicted₁| + |actual₂ - predicted₂| + ... + |actualₙ - predictedₙ|
 
 2. **Mean Absolute Error (MAE)**: the average of L₁ losses over a set of N examples
-
-$$
-\frac{1}{N} \sum_{i=1}^{N} | \text{actual value}_i - \text{predicted value}_i |
-$$
+   MAE = (1/N) × Σ |actual - predicted|
 
 3. **L₂ Loss**: sum of squared difference between predicted and actual values
-
-$$
-\sum_{i=1}^{N} (\text{actual value}_i - \text{predicted value}_i)^2
-$$
+   L₂ = (actual₁ - predicted₁)² + (actual₂ - predicted₂)² + ... + (actualₙ - predictedₙ)²
 
 4. **Mean Squared Error (MSE)**: the average of L₂ losses across a set of N examples
-
-$$
-\frac{1}{N} \sum_{i=1}^{N} (\text{actual value}_i - \text{predicted value}_i)^2
-$$
+   MSE = (1/N) × Σ (actual - predicted)²
 
 5. **Root Mean Squared Error (RMSE)**: the square root of the mean squared error (MSE)
-
-$$
-\sqrt{ \frac{1}{N} \sum_{i=1}^{N} (\text{actual value}_i - \text{predicted value}_i)^2 }
-$$
+   RMSE = √(MSE) = √[(1/N) × Σ (actual - predicted)²]
 
 MAE and RMSE give errors in the same units as what you're predicting, so humans can understand them more easily. MAE represents the average prediction error, whereas RMSE represents the spread of the errors.
 
@@ -273,17 +258,13 @@ Logistic regression models are trained using the same process as linear regressi
 
 Squared loss, $\text{L}_2$, works well for the linear model where the rate of change of output values is constant. In contrast, the rate of change of a logistic regression model is not constant. When the log odds ($z$) value is closer to 0, small increases in $z$ result in much larger changes in $y$ than if $z$ was a large positive or negative number.
 The loss function for logistic regression is Log Loss. The Log Loss equation returns the logarithm of the magnitude of change, rather than just the distance from the data to prediction. Log Loss is calculated as follows:
-
-$$
-\text{Log Loss} = -\frac{1}{N} \sum_{i=1}^{N} \left[ y_i \log(y'_i) + (1 - y_i)\log(1 - y'_i) \right]
-$$
+Log Loss = -(1/N) × Σ [y × log(ŷ) + (1-y) × log(1-ŷ)]
 
 where,
 
 - $N$ is the number of labeled examples in the dataset
-- $i$ is the index of an example in the dataset (example ($\text{x}_3$, $\text{y}_3$) is the third example in the dataset)
-- $y_i$ is the label for the ith example (must be 0 or 1)
-- $y'_i$ is your model's prediction for the ith example (between 0 and 1), given the set of features in $x_i$
+- y is the label for the ith example (must be 0 or 1)
+- ŷ is your model's prediction for the ith example (between 0 and 1), given the set of features in x
 
 #### Regularization
 
