@@ -145,7 +145,7 @@ Loss is a numeric metric that describes how wrong a model's predictions are. It 
 
 #### Types of Losses in Linear Regression
 
-#### Types of Losses in Linear Regression
+Types of Losses in Linear Regression
 
 1. **L₁ Loss**: sum of the absolute values of the difference between the actual values and the predicted values
 
@@ -282,8 +282,8 @@ where,
 
 - $N$ is the number of labeled examples in the dataset
 - $i$ is the index of an example in the dataset (example ($\text{x}_3$, $\text{y}_3$) is the third example in the dataset)
-- $\text{y}_i$ is the label for the ith example (must be 0 or 1)
-- $\text{y}_i$' is your model's prediction for the ith example (between 0 and 1), given the set of features in $\text{x}_i$
+- $y_i$ is the label for the ith example (must be 0 or 1)
+- $y'_i$ is your model's prediction for the ith example (between 0 and 1), given the set of features in $x_i$
 
 #### Regularization
 
@@ -367,29 +367,84 @@ If class membership isn't exclusive, which is to say, an example can be assigned
 
 ## The ML Workflow
 
-1.
-2.
-3.
+Standard supervised learning pipeline:
+
+1. **Load & Inspect Data** - Import dataset, check shape, types, missing values, target distribution
+2. **Clean Data** - Handle missing values, remove duplicates, fix outliers, validate data quality
+3. **Feature Engineering** - Encode categorical variables, scale numerical features, create new features
+4. **Split Data** - Train/validation/test split (or just train/test for simple projects)
+5. **Train Model** - Fit model on training data
+6. **Evaluate** - Check performance on validation/test set using appropriate metrics
+7. **Check Overfitting** - Compare train vs test scores (gap >5% suggests overfitting)
+8. **Iterate** - Adjust features, hyperparameters, or try different models based on results
+9. **Final Test** - Confirm performance on held-out test set
+10. **Deploy** - Use model on real-world data
+
+In summary, load, clean, engineer, split, train, evaluate, iterate until test performance is good.
 
 ---
 
 ## Train/Test Split
 
-**Why we need it:**
+**Quick summary**: Split data before any processing. Typical: 60% train / 20% validation / 20% test. Fit transformations on train only, then apply to validation/test. See "Dividing the Original Dataset" section for full details.
 
-**How it works:**
-
-**Data leakage:**
+**Data leakage**: Using test/validation data to influence training (e.g., fitting scaler on entire dataset before splitting). This gives falsely optimistic results.
 
 ---
 
 ## Feature Engineering
 
+Process of transforming raw data into features that help models learn better.
+
 ### Handling Missing Values
+
+**Options**:
+
+- **Delete**: If <5% missing and enough data remains
+- **Impute numerical**: Use mean/median (median better for outliers)
+- **Impute categorical**: Use mode or create "missing" category
+- **Add indicator**: Boolean column showing which values were imputed
+
+**Best practice**: Document which values are imputed (model should know the difference)
+
+_See "Numerical Data: Scrubbing" and "Complete vs Incomplete Examples" sections for details._
 
 ### Encoding Categorical Variables
 
+**Why needed**: Models only understand numbers, not strings.
+
+**Methods**:
+
+- **Label Encoding**: Assign integers (0, 1, 2...) - use for ordinal data (small/medium/large)
+- **One-Hot Encoding**: Binary vector for each category - use for nominal data (red/blue/green)
+- **Target Encoding**: Replace category with mean of target - use carefully (risk of leakage)
+
+**One-hot example**:
+
+- Color: Red -> [1, 0, 0]
+- Color: Blue -> [0, 1, 0]
+- Color: Green -> [0, 0, 1]
+
+_See "Categorical Data" section for vocabulary, sparse representation, and OOV handling._
+
 ### Feature Scaling
+
+**Why needed**: Features on different scales (age: 0-100, income: 0-100000) cause training issues.
+
+**Methods**:
+
+- **Min-Max Scaling (Linear)**: Scale to [0, 1] range - use for uniform distributions
+- **Standardization (Z-score)**: Mean=0, StdDev=1 - use for normal distributions (most common)
+- **Log Scaling**: log(x) - use for power-law distributions (highly skewed data)
+
+**When to use**:
+
+- **Always for**: Linear models, logistic regression, SVM, neural networks
+- **Not needed for**: Tree-based models (Random Forest, XGBoost)
+
+**CRITICAL**: Fit scaler on TRAIN set only, then transform train/test/validation.
+
+_See "Numerical Data: Normalization" section for formulas and detailed guidance._
 
 ---
 
@@ -494,9 +549,15 @@ For an imbalanced dataset, FPR is generally a more informative metric than accur
 
 #### MAE (Mean Absolute Error)
 
+Average absolute difference: |predicted - actual|. If MAE = $20k, predictions are off by $20k on average. Easy to interpret (same units as target). More info in "Linear Regression" section.
+
 #### RMSE (Root Mean Squared Error)
 
+Square root of mean squared error. Penalizes large errors more heavily than MAE due to squaring. More sensitive to outliers. Also more info in "Linear Regression" section.
+
 #### R² (R-squared)
+
+Proportion of variance explained by model (0 to 1). R² = 0.85 means model explains 85% of price variation. Remaining 15% is unexplained variance.
 
 ---
 
@@ -934,15 +995,31 @@ An underfit model doesn't even make good predictions on the training data. Under
 - Training with too high a regularization rate.
 - Providing too few hidden layers in a deep neural network.
 
-### How to Detect
-
-### How to Fix
-
 ---
 
 ## Model Selection
 
 ### When to Use What
+
+**Logistic Regression** (Classification):
+
+- Baseline model, fast, interpretable
+- Use for: linear decision boundaries, need to explain predictions
+- Avoid for: highly non-linear data
+
+**Random Forest** (Both):
+
+- Handles non-linearity, feature interactions
+- Use for: complex patterns, don't need interpretability
+- Avoid for: need to explain to stakeholders, very small datasets
+
+**Linear Regression** (Regression):
+
+- Baseline, interpretable, fast
+- Use for: linear relationships, need coefficients
+- Avoid for: clear non-linear patterns
+
+**Strategy**: Start simple (Linear/Logistic), check performance. If insufficient, try Random Forest. Compare train vs test scores to check overfitting.
 
 ---
 
