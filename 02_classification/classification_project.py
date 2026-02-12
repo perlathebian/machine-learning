@@ -14,6 +14,13 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
 
+from sklearn.metrics import (
+    accuracy_score, precision_score, recall_score, 
+    f1_score, confusion_matrix, classification_report
+)
+
+import os
+os.makedirs('results', exist_ok=True)
 
 # Load data
 df = pd.read_csv('data/titanic.csv')
@@ -185,3 +192,115 @@ for name, model in models.items():
 
 print("\nBoth models trained. Ready for evaluation!")
 
+
+
+# MODEL EVALUATION
+
+for name, result in results.items():
+    print("\n")
+    print(f"{name} EVALUATION")
+    print("\n")
+    
+    # Calculate metrics
+    train_acc = accuracy_score(y_train, result['y_pred_train'])
+    test_acc = accuracy_score(y_test, result['y_pred_test'])
+    precision = precision_score(y_test, result['y_pred_test'])
+    recall = recall_score(y_test, result['y_pred_test'])
+    f1 = f1_score(y_test, result['y_pred_test'])
+    
+    # Store in results dictionary
+    results[name]['metrics'] = {
+        'train_accuracy': train_acc,
+        'test_accuracy': test_acc,
+        'precision': precision,
+        'recall': recall,
+        'f1': f1
+    }
+    
+    print(f"Train Accuracy: {train_acc:.4f}")
+    print(f"Test Accuracy:  {test_acc:.4f}")
+    print(f"Precision:      {precision:.4f}")
+    print(f"Recall:         {recall:.4f}")
+    print(f"F1-Score:       {f1:.4f}")
+    
+    # Checking for overfitting
+    gap = train_acc - test_acc
+    if gap > 0.05:
+        print(f"\nPossible overfitting (gap: {gap:.4f})")
+        print("   Train score significantly higher than test score")
+    else:
+        print(f"\nGood generalization (gap: {gap:.4f})")
+        print("   Model performs similarly on train and test data")
+    
+    # Confusion matrix
+    cm = confusion_matrix(y_test, result['y_pred_test'])
+    print(f"\nConfusion Matrix:")
+    print(cm)
+    print(f"\nInterpretation:")
+    print(f"  True Negatives (TN):  {cm[0,0]} - Correctly predicted 'not survived'")
+    print(f"  False Positives (FP): {cm[0,1]} - Predicted 'survived' but actually didn't")
+    print(f"  False Negatives (FN): {cm[1,0]} - Predicted 'not survived' but actually did")
+    print(f"  True Positives (TP):  {cm[1,1]} - Correctly predicted 'survived'")
+
+
+# VISUALIZATIONS
+
+# Choose best model based on test accuracy
+best_model_name = max(results, key=lambda x: results[x]['metrics']['test_accuracy'])
+best_result = results[best_model_name]
+
+print("\n")
+print(f"BEST MODEL: {best_model_name}")
+print("\n")
+
+# Create confusion matrix heatmap
+cm = confusion_matrix(y_test, best_result['y_pred_test'])
+
+plt.figure(figsize=(8, 6))
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', 
+            xticklabels=['Not Survived', 'Survived'],
+            yticklabels=['Not Survived', 'Survived'])
+plt.title(f'{best_model_name} - Confusion Matrix')
+plt.ylabel('Actual')
+plt.xlabel('Predicted')
+plt.tight_layout()
+plt.savefig('results/confusion_matrix.png', dpi=300, bbox_inches='tight')
+plt.close()
+
+print("Confusion matrix saved to results/confusion_matrix.png")
+
+
+# SAVE EVALUATION REPORT
+
+
+with open('results/evaluation_report.txt', 'w') as f:
+    f.write("CLASSIFICATION PROJECT EVALUATION REPORT\n")
+    f.write("=" * 60 + "\n\n")
+    
+    f.write(f"Best Model: {best_model_name}\n")
+    f.write(f"Test Accuracy: {best_result['metrics']['test_accuracy']:.4f}\n")
+    f.write(f"Precision: {best_result['metrics']['precision']:.4f}\n")
+    f.write(f"Recall: {best_result['metrics']['recall']:.4f}\n")
+    f.write(f"F1-Score: {best_result['metrics']['f1']:.4f}\n\n")
+    
+    f.write("Confusion Matrix:\n")
+    f.write(f"{cm}\n\n")
+    
+    f.write("Detailed Classification Report:\n")
+    f.write(classification_report(y_test, best_result['y_pred_test'],
+                                 target_names=['Not Survived', 'Survived']))
+    
+    f.write("\n" + "=" * 60 + "\n")
+    f.write("COMPARISON OF BOTH MODELS\n")
+    f.write("=" * 60 + "\n\n")
+    
+    for name, result in results.items():
+        f.write(f"{name}:\n")
+        f.write(f"  Test Accuracy: {result['metrics']['test_accuracy']:.4f}\n")
+        f.write(f"  Overfitting Gap: {result['metrics']['train_accuracy'] - result['metrics']['test_accuracy']:.4f}\n")
+        f.write("\n")
+
+print("Evaluation report saved to results/evaluation_report.txt")
+print("\n")
+print("CLASSIFICATION PROJECT COMPLETE")
+print("\n")
