@@ -8,6 +8,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
 # Load data
 df = pd.read_csv('data/titanic.csv')
@@ -96,3 +98,33 @@ print("FINAL FEATURE SET")
 print("\n")
 print(df.columns.tolist())
 print(f"\nFinal shape: {df.shape}")
+
+
+# TRAIN/TEST SPLIT
+
+# Separate features (X) from target/label (y)
+X = df.drop('Survived', axis=1)
+y = df['Survived']
+
+# Split: 80% train, 20% test
+# random_state=42 for reproducibility
+# stratify=y ensures same survival ratio in train and test
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+print("\n")
+print("TRAIN/TEST SPLIT")
+print(f"Training set: {len(X_train)} examples")
+print(f"Test set: {len(X_test)} examples")
+print(f"Train survival rate: {y_train.mean():.2%}")
+print(f"Test survival rate: {y_test.mean():.2%}")
+
+# Feature Scaling
+# Fit and trasnform on train, transform only on test to prevent data leakage
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)  
+
+print("\nData preprocessing complete!!")
+print("Ready for model training")
