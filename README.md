@@ -38,6 +38,19 @@
 [Detailed Project Documentation](02_classification/README.md)  
 [View Code](02_classification/classification_project.py)
 
+#### Results Visualization
+
+**Confusion Matrix**
+
+![Confusion Matrix](02_classification/results/confusion_matrix.png)
+
+The confusion matrix shows:
+
+- **97 True Negatives:** Correctly predicted non-survivors
+- **51 True Positives:** Correctly predicted survivors
+- **13 False Positives:** Predicted survival incorrectly
+- **18 False Negatives:** Missed survival predictions
+
 ### Phase 3: Regression Project
 
 - [ ] Feature scaling and engineering
