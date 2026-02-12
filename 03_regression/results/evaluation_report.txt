@@ -1,0 +1,29 @@
+REGRESSION PROJECT EVALUATION REPORT
+============================================================
+
+Best Model: Random Forest
+Test MAE:  $32.84k
+Test RMSE: $50.48k
+Test R²:   0.8055
+
+INTERPRETATION:
+- Predictions are off by $32.84k on average (MAE)
+- Model explains 80.6% of price variation (R²)
+- RMSE of $50.48k penalizes large errors
+
+============================================================
+BOTH MODELS COMPARISON
+============================================================
+
+Linear Regression:
+  Test MAE:  $48.58k
+  Test RMSE: $67.49k
+  Test R²:   0.6524
+  Overfit Gap: 0.0062
+
+Random Forest:
+  Test MAE:  $32.84k
+  Test RMSE: $50.48k
+  Test R²:   0.8055
+  Overfit Gap: 0.1679
+
