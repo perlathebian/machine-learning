@@ -53,9 +53,48 @@ The confusion matrix shows:
 
 ### Phase 3: Regression Project
 
-- [ ] Feature scaling and engineering
-- [ ] Multiple model comparison
-- [ ] Results interpretation
+- [x] Feature scaling and engineering
+- [x] Multiple model comparison
+- [x] Results interpretation
+
+#### Key Decisions
+
+**Feature Engineering:**
+
+- Created RoomsPerPerson
+- Created BedroomRatio (ratio shows bedroom density)
+- Created PeoplePerRoom (population density metric)
+- Rationale: Ratios often more predictive than raw counts
+
+**Model Choice:**
+
+- Linear Regression: Baseline, fast
+- Random Forest: Better for non-linear patterns
+- Winner: Random Forest
+
+**Scaling:**
+
+- StandardScaler important for regression
+- Features on different scales: Population (thousands) vs Latitude (tens)
+- Linear models fail without scaling
+
+#### Results
+
+- Test MAE: $32.84k - average prediction error
+- Test RMSE: $50.48k - penalizes large errors more
+- Test R²: 0.8055 - explains 80.6% of price variance
+
+#### Learnings
+
+- Feature engineering (ratios) improved R² by ~0.05
+- Random Forest beat Linear Regression (R² 0.8055 vs 0.6524)
+- Proper scaling essential - without it, Linear Regression R² was negative
+
+#### Visualization
+
+**Plots**
+
+![Plots](03_regression/results/prediction_plot.png)
 
 ## Technical Stack
 
@@ -75,3 +114,4 @@ The confusion matrix shows:
 
 Completing Google ML Crash Course and building conceptual foundation.
 Completed Classification Project (used Kaggle's Titanic dataset).
+Completed Regression Project (sklearn's built-in dataset).
