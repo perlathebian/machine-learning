@@ -2,20 +2,20 @@
 
 **Purpose**: Build foundational ML competency through structured learning and hands-on projects.
 
-**Status**: In Progress - Concepts Phase
+**Status**: In Progress - Practical Phase (Classification)
 
 ## Learning Journey
 
 ### Phase 1: Core Concepts (In Progress)
 
-- [ ] ML fundamentals and workflow
-- [ ] Train/test split and evaluation
-- [ ] Classification vs regression
-- [ ] Overfitting and generalization
+- [x] ML fundamentals and workflow
+- [x] Train/test split and evaluation
+- [x] Classification vs regression
+- [x] Overfitting and generalization
 
 ### Phase 2: Classification Project
 
-- [ ] Data preparation and feature engineering
+- [x] Data preparation and feature engineering
 - [ ] Model training and evaluation
 - [ ] Performance visualization
 
