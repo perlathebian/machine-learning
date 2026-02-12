@@ -16,8 +16,27 @@
 ### Phase 2: Classification Project
 
 - [x] Data preparation and feature engineering
-- [ ] Model training and evaluation
-- [ ] Performance visualization
+- [x] Model training and evaluation
+- [x] Performance visualization
+
+#### Classification: Titanic Survival Prediction
+
+**Objective:** Predict passenger survival using binary classification
+
+**Approach:**
+
+- Feature engineering: Created FamilySize and IsAlone features
+- Models: Logistic Regression vs Random Forest
+
+**Results:**
+
+- **Best Model:** Random Forest
+- **Test Accuracy:** 82.68%
+- **Key Decision:** Chose Random Forest despite 15.5% overfitting gap because test performance was superior (82.7% vs 80.5%)
+
+[View Confusion Matrix](02_classification/results/confusion_matrix.png)  
+[Detailed Project Documentation](02_classification/README.md)  
+[View Code](02_classification/classification_project.py)
 
 ### Phase 3: Regression Project
 
@@ -42,3 +61,4 @@
 ## Current Focus
 
 Completing Google ML Crash Course and building conceptual foundation.
+Completed Classification Project (used Kaggle's Titanic dataset).
