@@ -10,6 +10,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.datasets import fetch_california_housing
 
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+
 # Load data (built into sklearn)
 housing = fetch_california_housing()
 df = pd.DataFrame(housing.data, columns=housing.feature_names)
@@ -83,3 +88,76 @@ print("NEW FEATURES CREATED")
 print("\n")
 print(['PopulationPerHousehold', 'BedroomRatio', 'PeoplePerRoom'])
 print(f"\nFinal feature count: {df.shape[1] - 1}")  # -1 for target column
+
+
+# TRAIN/TEST SPLIT
+
+# Separate features from target
+X = df.drop('PRICE', axis=1)
+y = df['PRICE']
+
+# Split 80/20
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+print("\n")
+print("TRAIN/TEST SPLIT")
+print("\n")
+print(f"Training set: {len(X_train)} examples")
+print(f"Test set: {len(X_test)} examples")
+print(f"Train price mean: ${y_train.mean()*100:.2f}k")
+print(f"Test price mean: ${y_test.mean()*100:.2f}k")
+
+# Feature Scaling
+# Features on vastly different scales (population: thousands, latitude: tens)
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+print("\nData preparation complete!!")
+
+
+# MODEL SELECTION
+
+# Will train 2 models and compare:
+
+# 1. LINEAR REGRESSION
+#    Pros: Fast, interpretable, extrapolates
+#    Cons: Assumes linear relationship
+#    Use case: Good baseline
+
+# 2. RANDOM FOREST REGRESSOR
+#    Pros: Handles non-linearity, feature interactions
+#    Cons: Doesn't extrapolate, less interpretable
+#    Use case: Usually better RMSE
+
+models = {
+    'Linear Regression': LinearRegression(),
+    'Random Forest': RandomForestRegressor(n_estimators=100, random_state=42)
+}
+
+results = {}
+
+print("\n")
+print("MODEL TRAINING")
+print("\n")
+
+for name, model in models.items():
+    print(f"\nTraining {name}...")
+    
+    # Train
+    model.fit(X_train_scaled, y_train)
+    
+    # Predict
+    y_pred_train = model.predict(X_train_scaled)
+    y_pred_test = model.predict(X_test_scaled)
+    
+    # Store
+    results[name] = {
+        'model': model,
+        'y_pred_train': y_pred_train,
+        'y_pred_test': y_pred_test
+    }
+    
+    print(f"{name} trained!!")
