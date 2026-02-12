@@ -90,7 +90,7 @@ df['PeoplePerRoom'] = df['AveOccup'] / df['AveRooms']
 print("\n")
 print("NEW FEATURES CREATED")
 print("\n")
-print(['PopulationPerHousehold', 'BedroomRatio', 'PeoplePerRoom'])
+print(['RoomsPerPerson', 'BedroomRatio', 'PeoplePerRoom'])
 print(f"\nFinal feature count: {df.shape[1] - 1}")  # -1 for target column
 
 
