@@ -1,0 +1,35 @@
+CLASSIFICATION PROJECT EVALUATION REPORT
+============================================================
+
+Best Model: Random Forest
+Test Accuracy: 0.8268
+Precision: 0.7969
+Recall: 0.7391
+F1-Score: 0.7669
+
+Confusion Matrix:
+[[97 13]
+ [18 51]]
+
+Detailed Classification Report:
+              precision    recall  f1-score   support
+
+Not Survived       0.84      0.88      0.86       110
+    Survived       0.80      0.74      0.77        69
+
+    accuracy                           0.83       179
+   macro avg       0.82      0.81      0.81       179
+weighted avg       0.83      0.83      0.83       179
+
+============================================================
+COMPARISON OF BOTH MODELS
+============================================================
+
+Logistic Regression:
+  Test Accuracy: 0.8045
+  Overfitting Gap: -0.0039
+
+Random Forest:
+  Test Accuracy: 0.8268
+  Overfitting Gap: 0.1549
+
