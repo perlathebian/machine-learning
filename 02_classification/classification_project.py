@@ -8,8 +8,12 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+
 
 # Load data
 df = pd.read_csv('data/titanic.csv')
@@ -128,3 +132,56 @@ X_test_scaled = scaler.transform(X_test)
 
 print("\nData preprocessing complete!!")
 print("Ready for model training")
+
+
+# MODEL SELECTION
+
+# Two models will be trained and compared:
+#
+# 1. LOGISTIC REGRESSION
+#    Pros: Simple, fast, interpretable
+#    Cons: Assumes linear decision boundary
+#    Use case: Good baseline model
+#
+# 2. RANDOM FOREST CLASSIFIER  
+#    Pros: Handles non-linear relationships, feature interactions
+#    Cons: Less interpretable, slower training
+#    Use case: Usually better accuracy than logistic regression
+#
+# Strategy: Start with simple (Logistic), then try complex (RF)
+# Choose based on: test accuracy + overfitting chekc
+
+# Dictionary to store models
+models = {
+    'Logistic Regression': LogisticRegression(random_state=42, max_iter=1000),
+    'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42)
+}
+
+# Dictionary to store results
+results = {}
+
+print("\n")
+print("MODEL TRAINING")
+print("\n")
+
+for name, model in models.items():
+    print(f"\nTraining {name}...")
+    
+    # Train model
+    model.fit(X_train_scaled, y_train)
+    
+    # Make predictions
+    y_pred_train = model.predict(X_train_scaled)
+    y_pred_test = model.predict(X_test_scaled)
+    
+    # Store predictions for later evaluation
+    results[name] = {
+        'model': model,
+        'y_pred_train': y_pred_train,
+        'y_pred_test': y_pred_test
+    }
+    
+    print(f"{name} trained successfully!!")
+
+print("\nBoth models trained. Ready for evaluation!")
+
